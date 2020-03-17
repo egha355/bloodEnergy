@@ -148,10 +148,10 @@ with open(nodesFile,'r') as csvfile:
                 yValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
                 zValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
                 A0  = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
-            xValues[rownum] = float(row[0])*Lsb
-            yValues[rownum] = float(row[1])*Lsb
-            zValues[rownum] = float(row[2])*Lsb
-            A0[rownum]  = float(row[3])*Lsb**2
+            xValues[rownum] = float(row[0])
+            yValues[rownum] = float(row[1])
+            zValues[rownum] = float(row[2])
+            A0[rownum]  = float(row[3])
         rownum+=1
 
  # Read the element file
