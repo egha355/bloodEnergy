@@ -92,53 +92,17 @@ IndependentFieldUserNumber                = 12
 ProblemUserNumber                         = 13
 
 #================================================================================================================================
-#  Mesh Reading
-#================================================================================================================================
-
-if (ProgressDiagnostics):
-    print( " == >> Reading geometry from files... << == ")
-
-# Read the node file
-with open('input/nodes.csv','r') as csvfile:
-    reader = csv.reader(csvfile, delimiter=',')
-    rownum=0
-    for row in reader:
-        if (rownum==0):
-            header = row
-        else:
-            if (rownum==1):
-                totalNumberOfNodes = int(row[4])
-                xValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
-                yValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
-                zValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
-                A0  = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
-            xValues[rownum] = float(row[0])*1000
-            yValues[rownum] = float(row[1])*1000
-            zValues[rownum] = float(row[2])*1000
-            A0[rownum]  = float(row[3])*1000000
-        rownum+=1
-
- # Read the element file
-with open('input/elements.csv','r') as csvfile:
-    reader = csv.reader(csvfile,delimiter=',')
-    rownum=0
-    for row in reader:
-        if (rownum==0):
-            header = row
-        else:
-            if (rownum==1):
-                totalNumberOfElements=int(row[3])
-                elementNodes = (totalNumberOfElements+1)*[3*[0]]
-            elementNodes[rownum]=[int(row[0]),int(row[1]),int(row[2])]
-        rownum+=1
-
-#================================================================================================================================
 #  Initial Data & Default Values
 #================================================================================================================================
-
+Lsb  = 1000         # Length      (1000: m -> mm)
+Msb  = 1            # Mass        (kg)
+Tsb  = 1            # Time        (second)
+THsb = 1            # Temperature (Celcius)
+Esb  = 1            # Energy      (J)
+POsb = 1            # Power       (W)
 #-------------------=========
-Alpha = 1.57e-7*1000000        # mm2/s Diffusivity
-U    = 0.07                                # m/s flow velocity
+Alpha = 1.57e-7*Lsb**2/Tsb        # mm2/s Diffusivity
+U    = 0.07*Lsb/Tsb                               # mm/s flow velocity
 
 # Set the time parameters
 timeIncrement   = 0.1
@@ -159,6 +123,47 @@ MAXIMUM_ITERATIONS   = 1000   # default: 100000
 # Navier-Stokes solver
 EquationsSetSubtype = iron.EquationsSetSubtypes.ADVECTION_DIFFUSION
 ProblemSubtype      = iron.ProblemSubtypes.LINEAR_SOURCE_ADVECTION_DIFFUSION
+
+#================================================================================================================================
+#  Mesh Reading
+#================================================================================================================================
+
+if (ProgressDiagnostics):
+    print( " == >> Reading geometry from files... << == ")
+
+# Read the node file
+with open('input/nodes.csv','r') as csvfile:
+    reader = csv.reader(csvfile, delimiter=',')
+    rownum=0
+    for row in reader:
+        if (rownum==0):
+            header = row
+        else:
+            if (rownum==1):
+                totalNumberOfNodes = int(row[4])
+                xValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
+                yValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
+                zValues = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
+                A0  = numpy.zeros((totalNumberOfNodes+1,1),dtype = numpy.float)
+            xValues[rownum] = float(row[0])*Lsb
+            yValues[rownum] = float(row[1])*Lsb
+            zValues[rownum] = float(row[2])*Lsb
+            A0[rownum]  = float(row[3])*Lsb**2
+        rownum+=1
+
+ # Read the element file
+with open('input/elements.csv','r') as csvfile:
+    reader = csv.reader(csvfile,delimiter=',')
+    rownum=0
+    for row in reader:
+        if (rownum==0):
+            header = row
+        else:
+            if (rownum==1):
+                totalNumberOfElements=int(row[3])
+                elementNodes = (totalNumberOfElements+1)*[3*[0]]
+            elementNodes[rownum]=[int(row[0]),int(row[1]),int(row[2])]
+        rownum+=1
 
 #================================================================================================================================
 #  Coordinate System
@@ -397,7 +402,7 @@ for nodeIdx in range(1,totalNumberOfNodes+1):
         comp2=timeStep*2
         comp1=comp2-1
         IndependentFieldNavierStokes.ParameterSetUpdateNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,
-        versionIdx,derivIdx,nodeIdx,comp1,U*A0[nodeIdx][0])
+        versionIdx,derivIdx,nodeIdx,comp1,U*A0[nodeIdx][0]/1000) # flow rate in ml/s
         IndependentFieldNavierStokes.ParameterSetUpdateNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,
         versionIdx,derivIdx,nodeIdx,comp2,A0[nodeIdx][0])     
 
