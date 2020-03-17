@@ -49,6 +49,7 @@
 # Import the libraries (OpenCMISS,python,numpy,scipy)
 import numpy,math,cmath,csv,time,sys,os,pdb
 from opencmiss.iron import iron
+from input.parameters import Problem_Params
 
 # Diagnostics
 #iron.DiagnosticsSetOn(iron.DiagnosticTypes.ALL,[1,2,3,4,5],"Diagnostics",[""])
@@ -70,7 +71,7 @@ numberOfDimensions     = 1  #(One-dimensional)
 derivIdx = 1
 
 ProgressDiagnostics = False   # Set to diagnostics
-
+problemParams = Problem_Params()
 
 #================================================================================================================================
 #  Start Program
@@ -101,16 +102,17 @@ THsb = 1            # Temperature (Celcius)
 Esb  = 1            # Energy      (J)
 POsb = 1            # Power       (W)
 #-------------------=========
-Alpha = 1.57e-7*Lsb**2/Tsb        # mm2/s Diffusivity
-U    = 0.07*Lsb/Tsb                               # mm/s flow velocity
+Alpha = problemParams.diffusivity*Lsb**2/Tsb        # mm2/s Diffusivity
+U    = problemParams.velocity*Lsb/Tsb                               # mm/s flow velocity
+Nu    = 4.0
 
 # Set the time parameters
-timeIncrement   = 0.1
-startTime       = 0.0
-stopTime  = 100.1
+timeIncrement   = problemParams.timeIncrement
+startTime       = problemParams.startTime
+stopTime  = problemParams.timeSteps*timeIncrement
 
 # Set the output parameters
-DYNAMIC_SOLVER_DIFFUSION_OUTPUT_FREQUENCY = 100
+DYNAMIC_SOLVER_OUTPUT_FREQUENCY = problemParams.outputFrequency
 
 # Set the solver parameters
 #relativeTolerance   = 1.0E-05  # default: 1.0E-05
@@ -132,7 +134,8 @@ if (ProgressDiagnostics):
     print( " == >> Reading geometry from files... << == ")
 
 # Read the node file
-with open('input/nodes.csv','r') as csvfile:
+nodesFile=problemParams.nodesFile
+with open(nodesFile,'r') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     rownum=0
     for row in reader:
@@ -152,7 +155,8 @@ with open('input/nodes.csv','r') as csvfile:
         rownum+=1
 
  # Read the element file
-with open('input/elements.csv','r') as csvfile:
+elementsFile=problemParams.elementsFile
+with open(elementsFile,'r') as csvfile:
     reader = csv.reader(csvfile,delimiter=',')
     rownum=0
     for row in reader:
@@ -331,7 +335,8 @@ DependentFieldNavierStokes.DOFOrderTypeSet(iron.FieldVariableTypes.DELUDELN,iron
 EquationsSetNavierStokes.DependentCreateFinish()
 
 # Initialise dependent field
-DependentFieldNavierStokes.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,37.0)
+Tinit = problemParams.Tinit
+DependentFieldNavierStokes.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,Tinit)
 
 DependentFieldNavierStokes.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 DependentFieldNavierStokes.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
@@ -356,7 +361,7 @@ EquationsSetNavierStokes.MaterialsCreateFinish()
 diffusivity=Alpha
 materialsField.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,diffusivity)
 materialsField.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,2,
-    math.pi*4*diffusivity) # mm2/s. b-cT. b=pi*Nu*alpha/A * Tw and c = pi*Nu*alpha/A. We still need to divide by cross-section area.
+    math.pi*Nu*diffusivity) # mm2/s. b-cT. b=pi*Nu*alpha/A * Tw and c = pi*Nu*alpha/A. We still need to divide by cross-section area.
 
 materialsField.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 materialsField.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
@@ -454,7 +459,7 @@ TimeLoop = iron.ControlLoop()
 problem.ControlLoopGet([iron.ControlLoopIdentifiers.NODE],TimeLoop)
 TimeLoop.LabelSet('Time Loop')
 TimeLoop.TimesSet(startTime,stopTime,timeIncrement)
-TimeLoop.TimeOutputSet(DYNAMIC_SOLVER_DIFFUSION_OUTPUT_FREQUENCY)
+TimeLoop.TimeOutputSet(DYNAMIC_SOLVER_OUTPUT_FREQUENCY)
 problem.ControlLoopCreateFinish()
 
 #================================================================================================================================
@@ -508,10 +513,11 @@ nodes = iron.Nodes()
 region.NodesGet(nodes)
 
 # for nodeNumber in boundary:
+Tinlet= problemParams.Tinlet
 nodeDomain = Decomposition.NodeDomainGet(1,1)
 if nodeDomain == computationalNodeNumber:
     boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.U,1,1,1,1,
-    iron.BoundaryConditionsTypes.FIXED,[37.0])
+    iron.BoundaryConditionsTypes.FIXED,[Tinlet])
 
 
 DependentFieldNavierStokes.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
