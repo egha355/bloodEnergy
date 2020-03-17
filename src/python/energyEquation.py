@@ -138,22 +138,7 @@ with open('input/elements.csv','r') as csvfile:
 
 #-------------------=========
 Alpha = 1.57e-7*1000000        # mm2/s Diffusivity
-# rp     = 1.5e-3        # m, inner radius of the parent artery
-# rd1    = rp/math.sqrt(2)  # m, inner radius of the doughter artery 1
-# rd2    = rp/math.sqrt(2)  # m, inner radius of the doughter artery 2
-# Cp     = 4*Alpha/(rp*rp)   # 0.27911 1/s
-# print(Cp)
-# Cd1    = 4*Alpha/(rd1*rd1)   # 2*0.27911 1/s
-# Cd2    = 4*Alpha/(rd2*rd2)   # 2*0.27911 1/s
-# Tt    = 35.0          # C
-
-#===================----------
-U    = 0.07                                # m/2 flow velocity
-#le   = ArteryLength/totalNumberOfElements # Element length, assuming equi-lenght elements
-#le   = xValues[1]
-# beta = 1                                  # Full upwinding
-
-#-----------------------------
+U    = 0.07                                # m/s flow velocity
 
 # Set the time parameters
 timeIncrement   = 0.1
@@ -363,41 +348,10 @@ EquationsSetNavierStokes.MaterialsCreateFinish()
 
 
 # diffusivity=1.57e-7+U*beta*le/2 #U*beta*le/2=0.000416667 almost 3000 times of the real diffusivity Pe=Ule/2a=0.2*0.05/12/2/0.0004=1
-# print(le)
 diffusivity=Alpha
 materialsField.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,diffusivity)
 materialsField.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,2,
     math.pi*4*diffusivity) # mm2/s. b-cT. b=pi*Nu*alpha/A * Tw and c = pi*Nu*alpha/A. We still need to divide by cross-section area.
-#materialsField.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,2,C) 
-#materialsField.ComponentValuesInitialiseDP(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,2,alpha) 
-
-# for elementNumber in parentElements:
-#     elementDomain = Decomposition.ElementDomainGet(elementNumber)
-#     if elementDomain == computationalNodeNumber:
-#       materialsField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES, 
-#   elementNumber,2, Cp)
-
-# for elementNumber in doughterElements1:
-#     elementDomain = Decomposition.ElementDomainGet(elementNumber)
-#     if elementDomain == computationalNodeNumber:
-#       materialsField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES, 
-#   elementNumber,2, Cd1)
-
-# for elementNumber in doughterElements2:
-#     elementDomain = Decomposition.ElementDomainGet(elementNumber)
-#     if elementDomain == computationalNodeNumber:
-#       materialsField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES, 
-#   elementNumber,2, Cd2)
-
-#for elementNumber in parentElements:
-#    elementDomain = Decomposition.ElementDomainGet(elementNumber)
-#    if elementDomain == computationalNodeNumber:
-#      materialsField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES, 
-#  elementNumber,2, Cp)
-#      materialsField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES, 
-#  elementNumber,2, 0.5)
-#      materialsField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES, 
-#  elementNumber,3, 0.5)
 
 materialsField.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 materialsField.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
@@ -413,33 +367,6 @@ if (ProgressDiagnostics):
 sourceField = iron.Field()
 EquationsSetNavierStokes.SourceCreateStart(sourceFieldUserNumber,sourceField)
 EquationsSetNavierStokes.SourceCreateFinish()  
-
-#sourceField.ComponentValuesInitialise(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,1,0)
-
-# Source is b-cT; e.g. for my case C(Tt-T), b=CTt, c=C. Because source field is scalar type I cannot define 2 components.
-# So it is in 2nd component of the materials field.
-
-# for elementNumber in parentElements:
-#     elementDomain = Decomposition.ElementDomainGet(elementNumber)
-# #    if elementDomain == computationalNodeNumber:
-# #      sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,1,700.0/4.0e6)
-#     if elementDomain == computationalNodeNumber:
-#       sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,1,Cp*Tt)
-# #      sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,2,-C)
-
-# for elementNumber in doughterElements1:
-#     elementDomain = Decomposition.ElementDomainGet(elementNumber)
-# #    if elementDomain == computationalNodeNumber:
-# #      sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,1,700.0/4.0e6)
-#     if elementDomain == computationalNodeNumber:
-#       sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,1,Cd1*Tt)
-
-# for elementNumber in doughterElements2:
-#     elementDomain = Decomposition.ElementDomainGet(elementNumber)
-# #    if elementDomain == computationalNodeNumber:
-# #      sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,1,700.0/4.0e6)
-#     if elementDomain == computationalNodeNumber:
-#       sourceField.ParameterSetUpdateElement(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,elementNumber,1,Cd2*Tt)
 
 sourceField.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 sourceField.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
@@ -578,17 +505,9 @@ region.NodesGet(nodes)
 # for nodeNumber in boundary:
 nodeDomain = Decomposition.NodeDomainGet(1,1)
 if nodeDomain == computationalNodeNumber:
-# if nodeNumber==boundary[0]:
-#      boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.DELUDELN,1,1,nodeNumber,1,
-#        iron.BoundaryConditionsTypes.ROBIN,[2.0*1,2.0*10.0]) 
     boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.U,1,1,1,1,
     iron.BoundaryConditionsTypes.FIXED,[37.0])
-    # elif nodeNumber==boundary[1]:
-    #   boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.U,1,1,nodeNumber,1,
-    #     iron.BoundaryConditionsTypes.FIXED,[33.0])
-    # elif nodeNumber==boundary[2]:
-    #   boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.U,1,1,nodeNumber,1,
-    #     iron.BoundaryConditionsTypes.FIXED,[33.0])
+
 
 DependentFieldNavierStokes.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 DependentFieldNavierStokes.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
@@ -615,16 +534,16 @@ print( "Problem solved!")
 print( "#")
 
 # Export results
-baseName = "laplace"
-dataFormat = "PLAIN_TEXT"
-fml = iron.FieldMLIO()
-fml.OutputCreate(Mesh, "", baseName, dataFormat)
-fml.OutputAddFieldNoType(baseName+".geometric", dataFormat, GeometricField,
-    iron.FieldVariableTypes.U, iron.FieldParameterSetTypes.VALUES)
-fml.OutputAddFieldNoType(baseName+".phi", dataFormat, DependentFieldNavierStokes,
-    iron.FieldVariableTypes.U, iron.FieldParameterSetTypes.VALUES)
-fml.OutputWrite("LaplaceExample.xml")
-fml.Finalise()
+#baseName = "laplace"
+#dataFormat = "PLAIN_TEXT"
+#fml = iron.FieldMLIO()
+#fml.OutputCreate(Mesh, "", baseName, dataFormat)
+#fml.OutputAddFieldNoType(baseName+".geometric", dataFormat, GeometricField,
+#    iron.FieldVariableTypes.U, iron.FieldParameterSetTypes.VALUES)
+#fml.OutputAddFieldNoType(baseName+".phi", dataFormat, DependentFieldNavierStokes,
+#    iron.FieldVariableTypes.U, iron.FieldParameterSetTypes.VALUES)
+#fml.OutputWrite("LaplaceExample.xml")
+#fml.Finalise()
 
 iron.Finalise()
 
