@@ -11,7 +11,7 @@ class Problem_Params:
      #   self.source = 0.0
      #   self.convection = 20
      #   self.Tair = 0.0
-        self.velocity = 0.07
+        self.velocity = 0.104562
         self.Tinit = 37.0
         self.elementsFile = "input/elements.csv"
         self.nodesFile = "input/nodes.csv"

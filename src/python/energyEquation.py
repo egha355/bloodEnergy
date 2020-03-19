@@ -411,6 +411,8 @@ for nodeIdx in range(1,totalNumberOfNodes+1):
         IndependentFieldNavierStokes.ParameterSetUpdateNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,
         versionIdx,derivIdx,nodeIdx,comp2,A0[nodeIdx][0])     
 
+# Q=[4.44 -0.269 22.9 119 89 21.3 -18.2 -9.02 2.62 10.1 4.44]
+
 # Finish the parameter update
 IndependentFieldNavierStokes.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 IndependentFieldNavierStokes.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
@@ -518,7 +520,8 @@ nodeDomain = Decomposition.NodeDomainGet(1,1)
 if nodeDomain == computationalNodeNumber:
     boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.U,1,1,1,1,
     iron.BoundaryConditionsTypes.FIXED,[Tinlet])
-
+#    boundaryConditions.SetNode(DependentFieldNavierStokes,iron.FieldVariableTypes.U,1,1,49,1,
+#    iron.BoundaryConditionsTypes.FIXED,[35.6])
 
 DependentFieldNavierStokes.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
 DependentFieldNavierStokes.ParameterSetUpdateFinish(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)
