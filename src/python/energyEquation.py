@@ -103,7 +103,7 @@ Esb  = 1            # Energy      (J)
 POsb = 1            # Power       (W)
 #-------------------=========
 Alpha = problemParams.diffusivity*Lsb**2/Tsb        # mm2/s Diffusivity
-U    = problemParams.velocity*Lsb/Tsb                               # mm/s flow velocity
+#U    = problemParams.velocity*Lsb/Tsb                               # mm/s flow velocity
 Nu    = 4.0
 
 # Set the time parameters
