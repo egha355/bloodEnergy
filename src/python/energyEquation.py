@@ -399,6 +399,8 @@ IndependentFieldNavierStokes = iron.Field()
 EquationsSetNavierStokes.IndependentCreateStart(IndependentFieldUserNumber,IndependentFieldNavierStokes)
 EquationsSetNavierStokes.IndependentCreateFinish()
 
+Q=[4.44, -0.269, 22.9, 119.0, 89.0, 21.3, -18.2, -9.02, 2.62, 10.1, 4.44]
+
 # Set the velocity
 for nodeIdx in range(1,totalNumberOfNodes+1):
   nodeDomain = Decomposition.NodeDomainGet(nodeIdx,meshComponentNumberSpace)
@@ -407,11 +409,11 @@ for nodeIdx in range(1,totalNumberOfNodes+1):
         comp2=timeStep*2
         comp1=comp2-1
         IndependentFieldNavierStokes.ParameterSetUpdateNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,
-        versionIdx,derivIdx,nodeIdx,comp1,U*A0[nodeIdx][0]/1000) # flow rate in ml/s
+        versionIdx,derivIdx,nodeIdx,comp1,Q[timeStep-1]) # flow rate in ml/s
         IndependentFieldNavierStokes.ParameterSetUpdateNode(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES,
-        versionIdx,derivIdx,nodeIdx,comp2,A0[nodeIdx][0])     
+        versionIdx,derivIdx,nodeIdx,comp2,10.0)     # A is 10 mm2
 
-# Q=[4.44 -0.269 22.9 119 89 21.3 -18.2 -9.02 2.62 10.1 4.44]
+
 
 # Finish the parameter update
 IndependentFieldNavierStokes.ParameterSetUpdateStart(iron.FieldVariableTypes.U,iron.FieldParameterSetTypes.VALUES)

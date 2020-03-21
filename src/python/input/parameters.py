@@ -1,9 +1,9 @@
 class Problem_Params:
     def __init__(self):
-        self.timeIncrement = 0.1
+        self.timeIncrement = 0.01
         self.startTime = 0.0
-        self.timeSteps = 1001 #Hi
-        self.outputFrequency = 100
+        self.timeSteps = 301 #Hi
+        self.outputFrequency = 1
         # properties   
         self.diffusivity = 1.57e-7
      #   self.conductivity = 0.42
@@ -11,7 +11,7 @@ class Problem_Params:
      #   self.source = 0.0
      #   self.convection = 20
      #   self.Tair = 0.0
-        self.velocity = 0.104562
+     #   self.velocity = 0.104562
         self.Tinit = 37.0
         self.elementsFile = "input/elements.csv"
         self.nodesFile = "input/nodes.csv"
